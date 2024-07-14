@@ -1,26 +1,38 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <Navbar :loggedUser="loggedUser" :login="login" :logout="logout"></Navbar>
+    <router-view v-slot="{ Component}">
+      <component :is="Component" :num="num"  :add_one="add_one"/>
+    </router-view>
+    <Footer></Footer>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Navbar from './components/Navbar.vue'
+import Footer from './components/Footer.vue'
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  components: { 
+    Navbar,
+    Footer
+  },
+  data(){
+    return {
+      num: 0,
+      loggedUser: false,
+    }
+  },
+  methods: {
+    add_one(){
+      this.num = this.num+1
+    },
+    login(){
+        this.$router.push('/login')
+        this.loggedUser=true
+    },
+    logout(){
+        this.$router.push('/')
+        this.loggedUser=false
+    }
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
