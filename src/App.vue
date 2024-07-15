@@ -1,7 +1,14 @@
 <template>
-    <Navbar :loggedUser="loggedUser" :login="login" :logout="logout"></Navbar>
+    <Navbar 
+        :loggedStatus="loggedStatus" 
+        :userInfo="userInfo"
+    ></Navbar>
     <router-view v-slot="{ Component}">
-      <component :is="Component" :num="num"  :add_one="add_one"/>
+        <component 
+            :is="Component"
+            :loggedStatus="loggedStatus"
+            :userInfo="userInfo"
+        />
     </router-view>
     <Footer></Footer>
 </template>
@@ -9,30 +16,61 @@
 <script>
 import Navbar from './components/Navbar.vue'
 import Footer from './components/Footer.vue'
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getFirestore, doc, getDoc} from "firebase/firestore"
 
 export default {
-  components: { 
-    Navbar,
-    Footer
-  },
-  data(){
-    return {
-      num: 0,
-      loggedUser: false,
-    }
-  },
-  methods: {
-    add_one(){
-      this.num = this.num+1
+    components: { 
+        Navbar,
+        Footer
     },
-    login(){
-        this.$router.push('/login')
-        this.loggedUser=true
+    data(){
+        return {
+            loggedStatus: false,
+            auth: getAuth(),
+            userInfo: {
+                ID: null,
+                name: null,
+                permission: null,
+                roomNumber: null
+            },
+            db: getFirestore()
+        }
     },
-    logout(){
-        this.$router.push('/')
-        this.loggedUser=false
+    mounted(){
+        onAuthStateChanged(this.auth, (user)=>{
+            if (user) {
+                this.loggedStatus=true
+                this.userInfo.ID=this.auth.currentUser.uid 
+                this.getUserInfo()
+            }
+            else{
+                this.loggedStatus=false
+                this.userInfo={
+                    ID: null,
+                    name: null,
+                    permission: null,
+                    roomNumber: null
+                }
+            }
+        })
+    },
+    methods: {
+        async getUserInfo(){
+            try {
+                const docRef = doc(this.db, "user-information", this.userInfo.ID)
+                const docSnap = await getDoc(docRef)
+                if (docSnap.exists()){
+                    this.userInfo.name=docSnap.data().name
+                    this.userInfo.permission=docSnap.data().permission
+                    this.userInfo.roomNumber=docSnap.data().roomNumber
+                }else{
+                    console.log("No such user!")
+                }
+            } catch (error){
+                console.error("Error getting user info:",error)
+            }
+        }
     }
-  }
 }
 </script>
