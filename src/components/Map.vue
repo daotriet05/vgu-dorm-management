@@ -12,6 +12,7 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import _ from 'lodash';
 
 // Set the default icon paths
 delete L.Icon.Default.prototype._getIconUrl;
@@ -51,17 +52,13 @@ export default {
         zoomDelta: 0.1,
       });
 
-      if (this.map) {
-        const bounds = [[0, 0], [634, 634]];
-        this.map.fitBounds(bounds);
+      const bounds = [[0, 0], [634, 634]];
+      this.map.fitBounds(bounds);
 
-        L.control.scale({ position: 'bottomright' }).addTo(this.map);
-        L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
+      L.control.scale({ position: 'bottomright' }).addTo(this.map);
+      L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
 
-        this.map.on('click', this.addMarker);
-      } else {
-        console.error('Map object is undefined. Initialization failed.');
-      }
+      this.map.on('click', this.addMarker);
     },
     loadRasterizedSvg() {
       fetch('/mapconvert.html')
@@ -220,4 +217,33 @@ export default {
 }
 </script>
 
-<style
+<style>
+#map {
+  height: 500px;
+  width: 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+}
+
+.map-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.map-button:hover {
+  background-color: #0056b3;
+}
+
+@import "~leaflet/dist/leaflet.css";
+</style>
