@@ -1,6 +1,6 @@
 <template>
-    <footer class="footer">
-        <p>VGU DORM</p>
+    <footer>
+        <p>VGU DORM MANAGEMENT</p>
     </footer>
 </template>
 
@@ -11,7 +11,7 @@
 </script>
 
 <style scoped>
-    .footer {
+    footer {
         position: fixed;
         bottom: 0;
         width: 100%;
