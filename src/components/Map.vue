@@ -6,6 +6,7 @@
       <button @click="clearMarkers" class="map-button">Clear Markers</button>
       <button @click="addTestMarker" class="map-button">Add Test Marker</button>
     </div>
+    <div id="coordinatesDisplay" class="coordinates-display"></div>
   </div>
 </template>
 
@@ -16,7 +17,6 @@ import _ from 'lodash';
 
 // Set the default icon paths
 delete L.Icon.Default.prototype._getIconUrl;
-
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'marker-icon-2x.png',
   iconUrl: 'marker-icon.png',
@@ -39,8 +39,8 @@ export default {
   },
   mounted() {
     this.initMap();
+    this.loadRasterizedSvg();
     this.loadMarkers();
-    this.loadRasterizedSvg(); 
   },
   methods: {
     initMap() {
@@ -52,13 +52,17 @@ export default {
         zoomDelta: 0.1,
       });
 
-      const bounds = [[0, 0], [634, 634]];
-      this.map.fitBounds(bounds);
+      if (this.map) {
+        const bounds = [[0, 0], [634, 634]];
+        this.map.fitBounds(bounds);
 
-      L.control.scale({ position: 'bottomright' }).addTo(this.map);
-      L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
+        L.control.scale({ position: 'bottomright' }).addTo(this.map);
+        L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
 
-      this.map.on('click', this.addMarker);
+        this.map.on('click', this.addMarker);
+      } else {
+        console.error('Map object is undefined. Initialization failed.');
+      }
     },
     loadRasterizedSvg() {
       fetch('/mapconvert.html')
@@ -105,19 +109,6 @@ export default {
         .catch(error => {
           console.error('Error loading SVG overlay:', error);
         });
-    },
-    getCoordinates() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const { latitude, longitude } = position.coords;
-            alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
-          },
-          error => {
-            console.error(error.message);
-          }
-        );
-      }
     },
     addMarker(event) {
       const markerCoordinates = event.latlng;
@@ -212,9 +203,26 @@ export default {
       const popupContent = this.createPopupContent({ lat: testSvgCoordinates[0], lng: testSvgCoordinates[1] }, gpsCoordinates);
       const marker = L.marker(testSvgCoordinates).addTo(this.map).bindPopup(popupContent);
       this.markers.push(marker);
-    }
-  }
-}
+    },
+    getCoordinates() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+            document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
+          },
+          error => {
+            console.error(error.message);
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by this browser.');
+      }
+    },
+  },
+};
 </script>
 
 <style>
@@ -245,5 +253,9 @@ export default {
   background-color: #0056b3;
 }
 
-@import "~leaflet/dist/leaflet.css";
+.coordinates-display {
+  margin-top: 20px;
+  font-size: 16px;
+  color: #333;
+}
 </style>
