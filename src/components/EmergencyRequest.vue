@@ -6,7 +6,7 @@
   </template>
   
   <script>
-  import MapComponent from '@/components/MapComponent.vue'; // Adjust path as necessary
+  import MapComponent from './Map.vue'; // Adjust path as necessary
   
   export default {
     components: {
