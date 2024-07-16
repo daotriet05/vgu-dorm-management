@@ -2,6 +2,7 @@
   <div id="app">
     <div id="map" class="map-container"></div>
     <div class="button-container">
+      <button @click="getCoordinates" class="map-button">Get Coordinates</button>
       <button @click="clearMarkers" class="map-button">Clear Markers</button>
       <button @click="addTestMarker" class="map-button">Add Test Marker</button>
     </div>
@@ -11,7 +12,6 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import _ from 'lodash';
 
 // Set the default icon paths
 delete L.Icon.Default.prototype._getIconUrl;
@@ -39,8 +39,7 @@ export default {
   mounted() {
     this.initMap();
     this.loadMarkers();
-    this.getGeolocation();
-    this.loadRasterizedSvg();
+    this.loadRasterizedSvg(); 
   },
   methods: {
     initMap() {
@@ -110,13 +109,12 @@ export default {
           console.error('Error loading SVG overlay:', error);
         });
     },
-    getGeolocation() {
+    getCoordinates() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           position => {
             const { latitude, longitude } = position.coords;
-            const svgCoordinates = this.transformToSvg(latitude, longitude);
-            this.map.setView(svgCoordinates, 13);
+            alert(`Latitude: ${latitude}, Longitude: ${longitude}`);
           },
           error => {
             console.error(error.message);
@@ -222,33 +220,4 @@ export default {
 }
 </script>
 
-<style>
-#map {
-  height: 500px;
-  width: 100%;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.button-container {
-  display: flex;
-  gap: 10px;
-}
-
-.map-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.map-button:hover {
-  background-color: #0056b3;
-}
-
-@import "~leaflet/dist/leaflet.css";
-</style>
+<style
