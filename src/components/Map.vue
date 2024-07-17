@@ -208,7 +208,7 @@ export default {
     },
     getCoordinates() {
             if(navigator.geolocation) {
-                navigator.geolocation.watchPosition(              //watchPos: tracking the position whenever the device location changes
+                navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
                 position => {
                   const latitude = position.coords.latitude;
                   const longitude = position.coords.longitude;
