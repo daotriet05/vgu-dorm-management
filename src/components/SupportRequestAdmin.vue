@@ -4,7 +4,7 @@
             <div class="col-lg-6 offset-lg-3">
                 <h2>Support Request List</h2>
                 <ul>
-                <li v-for="request in requests" :key="request.id">
+                <li v-for="request in sortedRequests" :key="request.id">
                     <div class="row">
                         <div class="col-lg-10 col-12">
                             <p><span class="title">Type: {{ request.data().type }}</span></p>
@@ -30,6 +30,12 @@
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 
 export default {
+    computed: {
+        sortedRequests() {
+        // Assuming 'timestamp' is a Unix timestamp; adjust if it's a different format
+        return this.requests.sort((a, b) => b.data().timestamp - a.data().timestamp);
+        }
+    },
     data() {
         return {
             requests: [],
@@ -65,9 +71,17 @@ export default {
 
 <style scoped>
     .container-fluid{
-        margin-top: 40px;
+        margin-top: 200px;
         overflow: visible;
         padding-bottom: 5%;
+    }
+    @media only screen and (min-width: 600px) {
+        .container-fluid{
+            margin-top: 70px;
+        }
+        .container-fluid h2{
+            padding-top: 50px;
+        }
     }
     .container-fluid h2{
         text-align: center;
@@ -80,6 +94,7 @@ export default {
     ul {
         list-style-type: none;
         padding: 0;
+        margin-top: 20px;
     }
 
     li {
@@ -87,6 +102,9 @@ export default {
         margin-bottom: 10px;
         padding: 10px;
         border-radius: 5px;
+    }
+    li p{
+        margin-left: 20px;
     }
     .title{
         font-size: 20px;

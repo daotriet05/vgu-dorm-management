@@ -1,6 +1,10 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from './components/Home.vue'
 
+import Feed from './components/Feed.vue'
+import FeedUser from './components/FeedUser.vue'
+import FeedAdmin from './components/FeedAdmin.vue'
+
 import SupportRequest from './components/SupportRequest.vue'
 import SupportRequestUser from './components/SupportRequestUser.vue'
 import SupportRequestAdmin from './components/SupportRequestAdmin.vue'
@@ -17,6 +21,17 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes: [
         { path: '/', component: Home},
+        { 
+            path: '/Feed', 
+            component: Feed,
+            children: [
+                { path: 'User', component: FeedUser},
+                { path: 'Admin', component: FeedAdmin}
+            ],
+            meta:{
+                requiresAuth: true
+            }
+        },
         { 
             path: '/SupportRequest', 
             component: SupportRequest,

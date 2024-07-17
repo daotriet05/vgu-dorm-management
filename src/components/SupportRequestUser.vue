@@ -1,5 +1,5 @@
 <template>
-<div>
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-4 offset-lg-4">
@@ -20,8 +20,7 @@
             </div>
         </div>
     </div>
-    
-</div>
+
 </template>
 
 <script>
@@ -66,15 +65,25 @@ export default {
 
 <style scoped>
     .container-fluid{
-        margin-top: 40px;
+        margin-top: 200px;
         text-align: center;
+    }
+    @media only screen and (min-width: 600px) {
+        .container-fluid{
+            margin-top: 70px;
+        }
+        .container-fluid h2{
+            padding-top: 50px;
+        }
     }
     form {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 30px;
+        margin-top: 20px;
         background-color: bisque;
+        border-radius: 2%;
+        box-shadow: 0 0 7px rgb(247, 202, 148);
     }
     .dropdown{
         display: flex;

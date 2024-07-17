@@ -59,8 +59,16 @@ export default {
 
 <style scoped>
     .container-fluid{
-        margin-top: 40px;
+        margin-top: 200px;
         text-align: center;
+    }
+    @media only screen and (min-width: 600px) {
+        .container-fluid{
+            margin-top: 70px;
+        }
+        .container-fluid h2{
+            padding-top: 50px;
+        }
     }
     .login{
         display: flex;
@@ -69,6 +77,8 @@ export default {
         margin-top: 20px;
         background-color: bisque;
         padding: 20px;
+        border-radius: 2%;
+        box-shadow: 0 0 7px rgb(247, 202, 148);
     }
     input{
         width: 300px;
@@ -85,3 +95,4 @@ export default {
         background-color: #c0392b;
     }
 </style>
+ 

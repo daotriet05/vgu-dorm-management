@@ -1,5 +1,6 @@
 <template>
-    <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg">
             <div>
                     <img src="@\assets\VGU-Logo.png" alt="Logo" class="logo">
             </div>
@@ -12,6 +13,14 @@
                         title="Home page"
                         @click.prevent="$router.push('/')"
                     >Home</a>
+                </li>
+
+                <li>
+                    <a
+                        class="nav-link"
+                        aria-current="page"
+                        @click.prevent="navigateFeed"
+                    >Feed</a>
                 </li>
 
                 <li>
@@ -40,7 +49,9 @@
                 </form>
             </div>
             
-    </nav>
+        </nav>
+    </div>
+
 
 </template>
 
@@ -66,6 +77,12 @@ export default {
                 this.$router.push('/Login')
             }
         },
+        navigateFeed(){
+            if (this.loggedStatus==false) alert('please log in!')
+            else
+                if (this.userInfo.permission=='user') this.$router.push('/Feed/User')
+                else this.$router.push('/Feed/Admin')
+        },
         navigateSupportRequest(){
             if (this.loggedStatus==false) alert('please log in!')
             else
@@ -83,6 +100,12 @@ export default {
 </script>
 
 <style scoped>
+    .container-fluid{
+        position: fixed;
+        top: 0;
+        width: 100%;
+        padding: 0;
+    }
     nav {
         display: flex;
         align-items: center;

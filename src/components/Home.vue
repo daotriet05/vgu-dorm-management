@@ -38,6 +38,12 @@ export default {
         overflow: visible;
         padding-bottom: 5%;
         width: 100%;
+        margin-top: 200px;
+    }
+    @media only screen and (min-width: 600px) {
+        .container-fluid{
+            margin-top: 70px;
+        }
     }
     .container-fluid .row{
         margin-bottom: 2%;
