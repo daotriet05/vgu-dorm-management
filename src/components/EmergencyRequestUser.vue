@@ -3,7 +3,6 @@
       <p>Emergency Request User</p>
       <p>{{ userInfo.name }}</p>
       <!-- Include the MapComponent, assuming userInfo includes 'location' with 'lat' and 'lng' -->
-      <map-component :locations="[{ lat: userInfo.location.lat, lng: userInfo.location.lng }]" ></map-component>
     </div>
 </template>
     

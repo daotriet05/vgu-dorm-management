@@ -224,6 +224,7 @@ export default {
     //   }
     // },
     getCoordinates() {
+            console.log('bruh');
             if(navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
                 position => {

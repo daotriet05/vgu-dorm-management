@@ -1,17 +1,24 @@
 <template>
     <div class="emergency-request">
       <h1>Emergency Request</h1>
-      <map-component></map-component>
+      <router-view v-slot="{ Component}">
+        <component 
+            :is="Component"
+            :userInfo="userInfo"
+        />
+    </router-view>
+    <map-component></map-component>
     </div>
   </template>
   
   <script>
-  import MapComponent from './Map.vue'; // Adjust path as necessary
-  
+ import MapComponent from './Map.vue';
+
   export default {
     components: {
       MapComponent
-    }
+    },
+    props: ['userInfo']
   }
   </script>
   
