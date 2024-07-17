@@ -3,10 +3,10 @@
       <p>Emergency Request User</p>
       <p>{{ userInfo.name }}</p>
       <!-- Include the MapComponent, assuming userInfo includes 'location' with 'lat' and 'lng' -->
-      <map-component :locations="[{lat: userInfo.location.lat, lng: userInfo.location.lng}]"></map-component>
+      <map-component :locations="[{ lat: userInfo.location.lat, lng: userInfo.location.lng }]" ></map-component>
     </div>
 </template>
-  
+    
     <script>
     
     import MapComponent from './Map.vue'; 
@@ -64,25 +64,48 @@
                     console.error("Error fetching user info:", error);
                 }
             },
-            async sendCoordinatesToFirebase(coordinates) {
-                if(latitude && longitude && this.uid) {
-                try {
-                    const { latitude, longitude } = coordinates;
-                    const db = getDatabase();
-                    const emergencyRef = ref(db, `emergency_requests/${this.uid}`);
+            // async sendCoordinatesToFirebase(coordinates) {
+            //     const { latitude, longitude } = coordinates;
+            //     if(latitude && longitude && this.uid) {
+            //         try {
+            //             const db = getDatabase();
+            //             const emergencyRef = ref(db, `emergency_requests/${this.uid}`);
 
-                    await set(emergencyRef, {
-                        // uid: this.uid,
-                        // name: this.userInfo.name,
-                        // roomNumber: this.userInfo.roomNumber,
-                        latitude: latitude,
-                        longitude: longitude,
-                        timestamp: new Date().toTimeString(),
-                    });
-                    console.log("Emergency request sent with location:", latitude, longitude);
+            //             await set(emergencyRef, {
+            //                 // uid: this.uid,
+            //                 // name: this.userInfo.name,
+            //                 // roomNumber: this.userInfo.roomNumber,
+            //                 latitude: latitude,
+            //                 longitude: longitude,
+            //                 timestamp: new Date().toTimeString(),
+            //             });
+            //             console.log("Emergency request sent with location:", latitude, longitude);
+            //         } catch(e) {
+            //         console.error("Error sending emergency request: ", e);
+            //         }
+            //     }
+            // }
+            async sendCoordinatesToFirebase(coordinates) {
+                try {
+                        const { latitude, longitude } = coordinates;
+                        if(latitude && longitude && this.uid) {
+                            const db = getDatabase();
+                            const emergencyRef = ref(db, `emergency_requests/${this.uid}`);
+
+                            await set(emergencyRef, {
+                                // uid: this.uid,
+                                // name: this.userInfo.name,
+                                // roomNumber: this.userInfo.roomNumber,
+                                latitude: latitude,
+                                longitude: longitude,
+                                timestamp: new Date().toTimeString(),
+                            });
+                            console.log("Emergency request sent with location:", latitude, longitude);
+                    } else {
+                        console.error("Latitude, longitude, or UID is undefined.");
+                    } 
                 } catch(e) {
-                console.error("Error sending emergency request: ", e);
-                }
+                    console.error("Error sending emergency request: ", e);
                 }
             }
 

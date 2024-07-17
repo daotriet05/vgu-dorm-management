@@ -8,10 +8,16 @@ export default{
         events.get(eventName).push(fn)
     },
 
-    $off(eventName,fn){
-        throw { message: 'Not Implemented'}
+    $off(eventName, fn) {
+        if (events.has(eventName)) {
+          const listeners = events.get(eventName);
+          const index = listeners.indexOf(fn);
+          if (index !== -1) {
+            listeners.splice(index, 1);
+          }
+        }
     },
-
+    
     $emit(eventName, data){
         if (events.has(eventName))
             events.get(eventName).forEach(fn => fn(data))
