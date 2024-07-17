@@ -13,7 +13,7 @@
         </ul>
     </div>
 </template>
-  
+
 <script>
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 

@@ -206,27 +206,9 @@ export default {
       const marker = L.marker(testSvgCoordinates).addTo(this.map).bindPopup(popupContent);
       this.markers.push(marker);
     },
-    // getCoordinates() {
-    //   if (navigator.geolocation) {
-    //     navigator.geolocation.getCurrentPosition(
-    //       position => {
-    //         const latitude = position.coords.latitude;
-    //         const longitude = position.coords.longitude;
-    //         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-    //         document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
-    //       },
-    //       error => {
-    //         console.error(error.message);
-    //       }
-    //     );
-    //   } else {
-    //     alert('Geolocation is not supported by this browser.');
-    //   }
-    // },
     getCoordinates() {
-            console.log('bruh');
             if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
+                navigator.geolocation.watchPosition(              //watchPos: tracking the position whenever the device location changes
                 position => {
                   const latitude = position.coords.latitude;
                   const longitude = position.coords.longitude;
