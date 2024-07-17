@@ -14,6 +14,8 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import _ from 'lodash';
+import EventBus from '../utils/Events.js'; // Import the event bus
+
 
 // Set the default icon paths
 delete L.Icon.Default.prototype._getIconUrl;
@@ -204,22 +206,42 @@ export default {
       const marker = L.marker(testSvgCoordinates).addTo(this.map).bindPopup(popupContent);
       this.markers.push(marker);
     },
+    // getCoordinates() {
+    //   if (navigator.geolocation) {
+    //     navigator.geolocation.getCurrentPosition(
+    //       position => {
+    //         const latitude = position.coords.latitude;
+    //         const longitude = position.coords.longitude;
+    //         console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+    //         document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
+    //       },
+    //       error => {
+    //         console.error(error.message);
+    //       }
+    //     );
+    //   } else {
+    //     alert('Geolocation is not supported by this browser.');
+    //   }
+    // },
     getCoordinates() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          position => {
-            const latitude = position.coords.latitude;
-            const longitude = position.coords.longitude;
-            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-            document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
-          },
-          error => {
-            console.error(error.message);
-          }
-        );
-      } else {
-        alert('Geolocation is not supported by this browser.');
-      }
+            if(navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
+                position => {
+                  const latitude = position.coords.latitude;
+                  const longitude = position.coords.longitude;
+                  console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+                  document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                  EventBus.$emit('coordinates', { latitude, longitude });
+                },
+                error => {
+                  console.error("Error getting location", error.message);
+                },
+                {enableHighAccuracy: true, maximumAge: 0, timeout: 5000}
+                );
+            } else {
+              console.error("Geolocation is not supported by this browser.");
+            
+            }
     },
   },
 };

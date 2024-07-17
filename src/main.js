@@ -14,6 +14,7 @@ import { initializeApp } from "firebase/app";
 const firebaseConfig = {
   apiKey: "AIzaSyCcUo_1GSIxBDVQZRMIrwRIqtLIVx9E8NU",
   authDomain: "multidisciplinary-project-be.firebaseapp.com",
+  databaseURL: "https://multidisciplinary-project-be-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "multidisciplinary-project-be",
   storageBucket: "multidisciplinary-project-be.appspot.com",
   messagingSenderId: "655958428923",
