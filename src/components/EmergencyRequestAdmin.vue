@@ -1,6 +1,7 @@
 <template>
   <div>
     <h3>Emergency Requests Admin</h3>
+    <map-component></map-component>
     <ul>
       <li v-for="request in requests" :key="request.id">
         <p>Name: {{ request.name }}</p>
@@ -18,31 +19,33 @@
 
 <script>
 import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import MapComponent from './Map.vue';
 
 export default {
-  data() {
-    return {
-      requests: []
-    };
-  },
-  methods: {
-    async fetchRequests() {
-      const db = getFirestore(); // Initialize Firestore
-      const querySnapshot = await getDocs(collection(db, 'emergency-request'));
-      this.requests = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
+    components: { MapComponent},
+    data() {
+        return {
+        requests: []
+        };
     },
-    async deleteRequest(id) {
-      const db = getFirestore(); // Initialize Firestore
-      await deleteDoc(doc(db, 'emergency-request', id));
-      this.requests = this.requests.filter(request => request.id !== id);
+    methods: {
+        async fetchRequests() {
+        const db = getFirestore(); // Initialize Firestore
+        const querySnapshot = await getDocs(collection(db, 'emergency-request'));
+        this.requests = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        },
+        async deleteRequest(id) {
+        const db = getFirestore(); // Initialize Firestore
+        await deleteDoc(doc(db, 'emergency-request', id));
+        this.requests = this.requests.filter(request => request.id !== id);
+        }
+    },
+    async mounted() {
+        await this.fetchRequests();
     }
-  },
-  async mounted() {
-    await this.fetchRequests();
-  }
 };
 </script>
 

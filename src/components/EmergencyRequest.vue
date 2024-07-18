@@ -7,17 +7,12 @@
               :userInfo="userInfo"
           />
       </router-view>
-      <map-component></map-component>
       </div>
   </template>
     
   <script>
-    import MapComponent from './Map.vue';
 
     export default {
-      components: {
-        MapComponent
-      },
       props: ['userInfo']
     }
   </script>

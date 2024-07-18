@@ -120,6 +120,13 @@ export default {
       this.markers.push(marker);
       this.debouncedSaveMarkers();
     },
+    addMarkerFromGps(lat, lon) {
+        const svgCoordinates = this.transformToSvg(lat, lon);
+        const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon]);
+        const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent);
+        this.markers.push(marker);
+    },
+
     createPopupContent(markerCoordinates, gpsCoordinates) {
       const gpsLat = gpsCoordinates[0].toFixed(6);
       const gpsLng = gpsCoordinates[1].toFixed(6);
