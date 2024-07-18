@@ -1,6 +1,5 @@
   <template>
       <div class="emergency-request">
-        <h1>Emergency Request</h1>
         <router-view v-slot="{ Component}">
           <component 
               :is="Component"

@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc, updateDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 export default {
@@ -23,23 +23,23 @@ export default {
     },
     methods: {
         async submitRequest() {
-        const user = this.auth.currentUser;
-        if (user) {
-            try {
-                await addDoc(collection(this.db, "request-support"), {
-                    uid: user.uid,
-                    message: this.message,
-                    name: this.userInfo.name,
-                    roomNumber: this.userInfo.roomNumber,
-                    timestamp: serverTimestamp(),
-                });
-                this.message = "";  // Clear the form after submission
-            } catch (error) {
-                console.error("Error submitting request:", error);
+            const user = this.auth.currentUser;
+            if (user) {
+                try {
+                    await addDoc(collection(this.db, "request-support"), {
+                        uid: user.uid,
+                        message: this.message,
+                        name: this.userInfo.name,
+                        roomNumber: this.userInfo.roomNumber,
+                        timestamp: serverTimestamp(),
+                    });
+                    this.message = "";  // Clear the form after submission
+                } catch (error) {
+                    console.error("Error submitting request:", error);
+                }
+            } else {
+                console.error("No user is signed in.");
             }
-        } else {
-            console.error("No user is signed in.");
-        }
         }
     }
 };

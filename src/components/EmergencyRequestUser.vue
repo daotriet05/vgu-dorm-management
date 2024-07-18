@@ -1,19 +1,25 @@
 <template>
   <div>
-    <p>Emergency Request User</p>
+    <h2>Emergency Request User</h2>
     <div id="app">
         <div id="map" class="map-container"></div>
         <div class="button-container">
-            <button @click="getCoordinates" class="map-button">Get Coordinates</button>
-            <!-- <button @click="clearMarkers" class="map-button">Clear Markers</button>
-            <button @click="addTestMarker" class="map-button">Add Test Marker</button> -->
-            <button @click="startRequest" class="map-button">start</button>
-            <button @click="addTestMarker" class="map-button">add test</button>
-            <button @click="clearMarkers" class="map-button">clear</button>
+            <!-- <button @click="getCoordinates" class="map-button">Get Coordinates</button> -->
+            <button v-if="!requestStatus" @click="startRequest" class="map-button">start</button>
+            <button v-if="requestStatus" @click="stopRequest" class="map-button">stop</button>
+            <!-- <button @click="addTestMarker" class="map-button">add test</button>
+            <button @click="clearMarkers" class="map-button">clear</button> -->
+        </div>
+        <div class="dropdown">
+            <label for="problemType">Choose your problem type:</label>
+            <select v-model="problemType" name="problemType" id="dropdown-select" required>
+                <option value="Health problem">Health problem</option>
+                <option value="Security problem">Security problem</option>
+                <option value="Fire">Fire</option>
+            </select>
         </div>
         <div id="coordinatesDisplay" class="coordinates-display"></div>
     </div>
-    <!-- Include the MapComponent, assuming userInfo includes 'location' with 'lat' and 'lng' -->
   </div>
 </template>
 
@@ -22,8 +28,7 @@
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import _ from 'lodash';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { getFirestore, collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 
 // Set the default icon paths
 
@@ -40,6 +45,9 @@ export default {
                 { svg: [1000, 1000], gps: [11.106231, 106.613248] },
                 { svg: [0, 1000], gps: [11.106055, 106.612760] },
             ],
+            db: getFirestore(),
+            problemType: 'Health problem',
+            requestStatus: false,
         };
     },
     created(){
@@ -134,18 +142,20 @@ export default {
             this.debouncedSaveMarkers();
         },
 
-        addMarkerFromGps(lat, lon, user) {
+        addMarkerFromGps(lat, lon, user, problemType) {
             const svgCoordinates = this.transformToSvg(lat, lon);
-            const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], user);
+            console.log('start:',svgCoordinates);
+            const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], user, problemType);
             const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent);
             this.markers.push(marker);
         },
 
-        createPopupContent(markerCoordinates, gpsCoordinates, user) {
+        createPopupContent(markerCoordinates, gpsCoordinates, user, problemType) {
             const gpsLat = gpsCoordinates[0].toFixed(6);
             const gpsLng = gpsCoordinates[1].toFixed(6);
             return `
                 <b>Name:</b> ${user.name} <br>
+                <b> Problem Type:</b> ${problemType} <br>
                 <b>SVG Coordinates:</b> ${markerCoordinates.lat.toFixed(2)}, ${markerCoordinates.lng.toFixed(2)}<br>
                 <b>GPS Coordinates:</b> ${gpsLat}, ${gpsLng} 
             `;
@@ -244,30 +254,44 @@ export default {
             console.log('svg debug:',testSvgCoordinates);
             const gpsCoordinates = this.transformToGps(testSvgCoordinates[0], testSvgCoordinates[1]);
             console.log('gps debug:',gpsCoordinates);
-            const popupContent = this.createPopupContent({ lat: testSvgCoordinates[0], lng: testSvgCoordinates[1] }, gpsCoordinates, this.userInfo);
+            const popupContent = this.createPopupContent({ lat: testSvgCoordinates[0], lng: testSvgCoordinates[1] }, gpsCoordinates, this.userInfo, this.problemType);
             const marker = L.marker(testSvgCoordinates).addTo(this.map).bindPopup(popupContent);
             this.markers.push(marker);
         },
 
-        getCoordinates() {
-            if(navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
-                    position => {
-                        const latitude = position.coords.latitude;
-                        const longitude = position.coords.longitude;
-                        console.log(`Get gps coordinate = Latitude: ${latitude}, Longitude: ${longitude}`);
-                        const testSvg=this.transformToSvg(latitude,longitude)
-                        console.log(`Get svg coordinate = Latitude: ${testSvg[0]}, Longitude: ${testSvg[1]}`);
-                        document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
-                    },
-                    error => {
-                        console.error("Error getting location", error.message);
-                    },
-                    {enableHighAccuracy: true, maximumAge: 0, timeout: 5000}
-                );
-            } else {
-                console.error("Geolocation is not supported by this browser.");
-            }
+        // getCoordinates() {
+        //     if(navigator.geolocation) {
+        //         navigator.geolocation.getCurrentPosition(              //watchPos: tracking the position whenever the device location changes
+        //             position => {
+        //                 const latitude = position.coords.latitude;
+        //                 const longitude = position.coords.longitude;
+        //                 console.log(`Get gps coordinate = Latitude: ${latitude}, Longitude: ${longitude}`);
+        //                 const testSvg=this.transformToSvg(latitude,longitude)
+        //                 console.log(`Get svg coordinate = Latitude: ${testSvg[0]}, Longitude: ${testSvg[1]}`);
+        //                 document.getElementById('coordinatesDisplay').innerHTML = `
+        //                     <b>Name:</b> ${user.name} <br>
+        //                     <b> Problem Type:</b> ${problemType} <br>
+        //                     <b>SVG Coordinates:</b> ${markerCoordinates.lat.toFixed(2)}, ${markerCoordinates.lng.toFixed(2)}<br>
+        //                     <b>GPS Coordinates:</b> ${gpsLat}, ${gpsLng} 
+        //                 `;
+        //             },
+        //             error => {
+        //                 console.error("Error getting location", error.message);
+        //             },
+        //             {enableHighAccuracy: true, maximumAge: 0, timeout: 5000}
+        //         );
+        //     } else {
+        //         console.error("Geolocation is not supported by this browser.");
+        //     }
+        // },
+        async sendEmergencyRequest(gpsLat,gpsLon,user,displayStatus, problemType){
+            await updateDoc(doc(this.db, "user-location",user.ID),{
+                name: user.name,
+                lat: gpsLat,
+                lon: gpsLon,
+                display: displayStatus,
+                problemType: problemType
+            })
         },
         startRequest(){
             if(navigator.geolocation) {
@@ -275,8 +299,24 @@ export default {
                     position => {
                         const latitude = position.coords.latitude;
                         const longitude = position.coords.longitude;
-                        this.addMarkerFromGps(latitude,longitude)
-                        document.getElementById('coordinatesDisplay').innerHTML = `Latitude: ${latitude}, Longitude: ${longitude}`;
+                        // add marker to map
+                        this.addMarkerFromGps(latitude,longitude, this.userInfo, this.problemType)
+
+                        // lock select until stop the request
+                        document.getElementById("dropdown-select").disabled = true;
+
+                        // activate displayStatus and send gps location to the database
+                        this.sendEmergencyRequest(latitude,longitude,this.userInfo,true, this.problemType)
+
+                        // show gps location in the page
+                        document.getElementById('coordinatesDisplay').innerHTML = `
+                            <b>Name:</b> ${this.userInfo.name} <br>
+                            <b> Problem Type:</b> ${this.problemType} <br>
+                            <b>GPS Coordinates:</b> ${latitude}, ${longitude} 
+                        `;
+
+                        // change the requestStatus to true
+                        this.requestStatus=true
                     },
                     error => {
                         console.error("Error getting location", error.message);
@@ -288,7 +328,20 @@ export default {
             }
         },
         stopRequest(){
+            // clear marker on map
+            this.clearMarkers()
 
+            // deactivate displayStatus in the database
+            this.sendEmergencyRequest(0,0,this.userInfo,false,this.problemType)
+
+            // unlock select
+            document.getElementById("dropdown-select").disabled = false;
+
+            // hide gps location in the page
+            document.getElementById('coordinatesDisplay').innerHTML = ``;
+
+            // change the requestStatus to false
+            this.requestStatus=false
         }
     },
 };
