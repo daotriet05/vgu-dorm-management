@@ -1,10 +1,19 @@
 <template>
-    <h1>Login form</h1>
-    <p><input type="text" placeholder="Email" v-model="email"/></p>
-    <p><input type="password" placeholder="Password" v-model="password"/></p>
-    <p>If you don't have an account, please contact VGU DORM MANAGEMENT!</p>
-    <p v-if="errorMessage!=''">{{ errorMessage }}</p>
-    <p><button @click="login">Submit</button></p>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4 offset-lg-4">
+                <h2>Login form</h2>
+                <div class="login">
+                    <p><input type="text" placeholder="Email" v-model="email"/></p>
+                    <p><input type="password" placeholder="Password" v-model="password"/></p>
+                    <p>If you don't have an account, <br> please contact VGU DORM MANAGEMENT!</p>
+                    <p v-if="errorMessage!=''">{{ errorMessage }}</p>
+                    <p><button @click="login">Submit</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </template>
 
 <script>
@@ -47,3 +56,43 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    .container-fluid{
+        margin-top: 200px;
+        text-align: center;
+    }
+    @media only screen and (min-width: 600px) {
+        .container-fluid{
+            margin-top: 70px;
+        }
+        .container-fluid h2{
+            padding-top: 50px;
+        }
+    }
+    .login{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+        background-color: bisque;
+        padding: 20px;
+        border-radius: 2%;
+        box-shadow: 0 0 7px rgb(247, 202, 148);
+    }
+    input{
+        width: 300px;
+    }
+    button {
+        padding: 10px 20px;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #c0392b;
+    }
+</style>
+ 

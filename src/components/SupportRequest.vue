@@ -1,5 +1,4 @@
 <template>
-    <h1>Support Request</h1>
     <router-view v-slot="{ Component}">
         <component 
             :is="Component"
