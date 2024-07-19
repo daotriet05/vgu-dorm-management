@@ -148,7 +148,6 @@ export default {
         transformToSvg(lat, lon) {
             const { knownPoints } = this;
 
-            // Linear interpolation
             const svgWidth = 634;
             const svgHeight = 634;
             const gpsTopLeft = knownPoints[0].gps;
