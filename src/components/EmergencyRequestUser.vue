@@ -29,6 +29,7 @@
 <script>
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import _ from 'lodash';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 
 export default {
@@ -59,7 +60,6 @@ export default {
     mounted() {
         this.initMap();
         this.loadRasterizedSvg();
-        this.loadMarkers();
     },
     methods: {
         initMap() {
@@ -71,15 +71,11 @@ export default {
                 zoomDelta: 0.1,
             });
 
-            if (this.map) {
-                const bounds = [[0, 0], [634, 634]];
-                this.map.fitBounds(bounds);
+            const bounds = [[0, 0], [634, 634]];
+            this.map.fitBounds(bounds);
 
-                L.control.scale({ position: 'bottomright' }).addTo(this.map);
-                L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
-            } else {
-                console.error('Map object is undefined. Initialization failed.');
-            }
+            L.control.scale({ position: 'bottomright' }).addTo(this.map);
+            L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
         },
 
         loadRasterizedSvg() {
@@ -94,7 +90,6 @@ export default {
                         console.log('SVG Element:', svgElement);
                         const svgBounds = [[0, 0], [svgElement.height.baseVal.value, svgElement.width.baseVal.value]];
 
-                        // Create an offscreen canvas to rasterize the SVG
                         const canvas = document.createElement('canvas');
                         canvas.width = svgElement.width.baseVal.value;
                         canvas.height = svgElement.height.baseVal.value;
@@ -132,7 +127,7 @@ export default {
         addMarkerFromGps(lat, lon, user, problemType) {
             const svgCoordinates = this.transformToSvg(lat, lon);
             const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], user, problemType);
-            const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
+            const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent);
             this.markers.push(marker);
         },
 
@@ -164,6 +159,25 @@ export default {
             );
 
             return [x, y];
+        },
+
+        transformToGps(x, y) {
+            const { knownPoints } = this;
+            const [p1, p2, p3, p4] = knownPoints;
+
+            const lat = this.bilinearInterpolation(
+                p1.svg[0], p2.svg[0], p3.svg[0], p4.svg[0],
+                p1.gps[0], p2.gps[0], p3.gps[0], p4.gps[0],
+                x, y
+            );
+
+            const lon = this.bilinearInterpolation(
+                p1.svg[1], p2.svg[1], p3.svg[1], p4.svg[1],
+                p1.gps[1], p2.gps[1], p3.gps[1], p4.gps[1],
+                x, y
+            );
+
+            return [lat, lon];
         },
 
         bilinearInterpolation(x1, x2, x3, x4, y1, y2, y3, y4, x, y) {
