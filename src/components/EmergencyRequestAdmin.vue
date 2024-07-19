@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-6 offset-lg-3">
+            <div class="col-lg-8 offset-lg-2">
                 <h2>Emergency Requests Admin</h2>
                 <div id="app">
                     <div id="map" class="map-container"></div>
@@ -64,11 +64,13 @@ export default {
                 maxZoom: 4,
                 zoomSnap: 0.1,
                 zoomDelta: 0.1,
+                maxBoundsViscosity: 1.0,
             });
 
-            const bounds = [[0, 0], [634, 634]]; // Adjust these bounds as per your SVG dimensions
+            const bounds = [[0, 0], [634, 634]];
+            this.map.setMaxBounds(bounds);
             this.map.fitBounds(bounds);
-            this.map.setView([317, 317], 1); // Center the map view
+            this.map.setView([317, 317], 1);
 
             L.control.scale({ position: 'bottomright' }).addTo(this.map);
             L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
@@ -86,7 +88,6 @@ export default {
                         console.log('SVG Element:', svgElement);
                         const svgBounds = [[0, 0], [svgElement.height.baseVal.value, svgElement.width.baseVal.value]];
 
-                        // Create an offscreen canvas to rasterize the SVG
                         const canvas = document.createElement('canvas');
                         canvas.width = svgElement.width.baseVal.value;
                         canvas.height = svgElement.height.baseVal.value;
@@ -205,12 +206,14 @@ export default {
 }
 
 #map {
-    height: 500px;
+    height: 700px;
     width: 100%;
     border: 2px solid #ddd;
     border-radius: 8px;
     margin-bottom: 20px;
     z-index: -1;
+    position: relative;
+    overflow: auto;
 }
 
 .button-container {
