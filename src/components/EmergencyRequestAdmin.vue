@@ -55,6 +55,9 @@ export default {
         this.initMap();
         this.loadRasterizedSvg();
         this.fetchRequests();
+        setInterval(() => {
+            this.fetchRequests(); // Fetch updates every 3 seconds
+        }, 3000)
     },
     methods: {
         initMap() {
@@ -163,8 +166,14 @@ export default {
             console.log(`Transform to SVG: Lat: ${lat}, Lon: ${lon}, X: ${x}, Y: ${y}`);
             return [x, y];
         },
-
+        clearMarkers() {
+            this.markers.forEach(marker => {
+                this.map.removeLayer(marker);
+            });
+            this.markers = [];
+        },
         async fetchRequests() {
+            this.clearMarkers()
             try {
                 const querySnapshot = await getDocs(collection(this.db, 'user-location'));
                 this.requests = querySnapshot.docs;

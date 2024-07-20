@@ -142,6 +142,13 @@ export default {
             `;
         },
 
+        clearMarkers() {
+            this.markers.forEach(marker => {
+                this.map.removeLayer(marker);
+            });
+            this.markers = [];
+        },
+
         transformToSvg(lat, lon) {
             const { knownPoints } = this;
             const [p1, p2, p3, p4] = knownPoints;
