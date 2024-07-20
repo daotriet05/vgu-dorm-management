@@ -34,7 +34,6 @@ export default {
         return {
             map: null,
             markers: [],
-            fixedMarker: null,
             knownPoints: [
                 { svg: [0, 0], gps: [11.106563, 106.612568] },
                 { svg: [1000, 0], gps: [11.106751, 106.613055] },
@@ -57,7 +56,6 @@ export default {
         this.initMap();
         this.loadRasterizedSvg();
         this.fetchRequests();
-        this.addFixedMarker();
         setInterval(() => {
             this.fetchRequests();
         }, 3000);
@@ -128,22 +126,6 @@ export default {
                 });
         },
 
-        addFixedMarker() {
-            console.log('Adding fixed marker');
-            const lat = 11.1063642;
-            const lon = 106.6131716;
-            const svgCoordinates = this.transformToSvg(lat, lon);
-            console.log(`Fixed Marker SVG Coordinates: ${svgCoordinates}`);
-
-            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 700 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 700) {
-                const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], 'Fixed Point', 'Health problem', 'Fixed description');
-                this.fixedMarker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
-                console.log('Fixed marker added successfully');
-            } else {
-                console.error('Fixed marker coordinates out of bounds:', svgCoordinates);
-            }
-        },
-
         addMarkerFromGps(lat, lon, name, problemType, description) {
             console.log(`Adding marker for: ${name}, Lat: ${lat}, Lon: ${lon}`);
             const svgCoordinates = this.transformToSvg(lat, lon);
@@ -153,6 +135,7 @@ export default {
                 const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
                 this.markers.push(marker);
             } else {
+                alert('You are out of VGU dorm area. Please enter to start request');
                 console.error('Coordinates out of bounds:', svgCoordinates);
             }
         },
