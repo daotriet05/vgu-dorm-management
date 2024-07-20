@@ -65,6 +65,9 @@ export default {
     },
     mounted() {
         this.fetchRequests();
+        setInterval(() => {
+            this.fetchRequests(); // Fetch updates every 3 seconds
+        }, 3000)
     },
 };
 </script>
