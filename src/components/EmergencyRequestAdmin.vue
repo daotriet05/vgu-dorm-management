@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-8 offset-lg-2">
+            <div class="col-lg-10 offset-lg-1">
                 <h2>Emergency Requests Admin</h2>
                 <div id="app">
                     <div id="map" class="map-container"></div>
@@ -57,7 +57,7 @@ export default {
         this.initMap();
         this.loadRasterizedSvg();
         this.fetchRequests();
-        this.addFixedMarker(); // Add the fixed marker here
+        this.addFixedMarker();
         setInterval(() => {
             this.fetchRequests(); // Fetch updates every 3 seconds
         }, 3000);
@@ -73,10 +73,10 @@ export default {
                 maxBoundsViscosity: 1.0,
             });
 
-            const bounds = [[0, 0], [634, 634]];
+            const bounds = [[0, 0], [700, 700]];
             this.map.setMaxBounds(bounds);
             this.map.fitBounds(bounds);
-            this.map.setView([317, 317], 1);
+            this.map.setView([350, 350], 1);
 
             L.control.scale({ position: 'bottomright' }).addTo(this.map);
             L.control.scale({ position: 'bottomleft', maxWidth: 100, metric: true, imperial: false }).addTo(this.map);
@@ -135,7 +135,7 @@ export default {
             const svgCoordinates = this.transformToSvg(lat, lon);
             console.log(`Fixed Marker SVG Coordinates: ${svgCoordinates}`);
 
-            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 634 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 634) {
+            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 700 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 700) {
                 const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], 'Fixed Point', 'Health problem', 'Fixed description');
                 this.fixedMarker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
                 console.log('Fixed marker added successfully');
@@ -148,7 +148,7 @@ export default {
             console.log(`Adding marker for: ${name}, Lat: ${lat}, Lon: ${lon}`);
             const svgCoordinates = this.transformToSvg(lat, lon);
             console.log(`SVG Coordinates: ${svgCoordinates}`);
-            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 634 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 634) {
+            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 700 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 700) {
                 const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], name, problemType, description);
                 const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
                 this.markers.push(marker);
@@ -172,8 +172,8 @@ export default {
         transformToSvg(lat, lon) {
             const { knownPoints } = this;
 
-            const svgWidth = 634;
-            const svgHeight = 634;
+            const svgWidth = 700;
+            const svgHeight = 700;
             const gpsTopLeft = knownPoints[0].gps;
             const gpsBottomRight = knownPoints[2].gps;
 
@@ -215,7 +215,7 @@ export default {
     padding: 20px;
 }
 .map-container {
-    height: 500px;
+    height: 700px; /* Increase the height of the map container */
 }
 .table-user {
     list-style: none;
