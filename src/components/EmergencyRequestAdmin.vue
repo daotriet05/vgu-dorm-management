@@ -13,6 +13,7 @@
                                 <p><span class="title">Problem Type: {{ request.data().problemType }}</span></p>
                                 <p>Name: {{ request.data().name }}</p>
                                 <p>Latitude: {{ request.data().lat }}, Longitude: {{ request.data().lon }}</p>
+                                <p>Description: {{ request.data().description }}</p>
                             </div>
                         </div>
                     </li>
@@ -33,6 +34,7 @@ export default {
         return {
             map: null,
             markers: [],
+            fixedMarker: null,
             knownPoints: [
                 { svg: [0, 0], gps: [11.106563, 106.612568] },
                 { svg: [1000, 0], gps: [11.106751, 106.613055] },
@@ -55,9 +57,10 @@ export default {
         this.initMap();
         this.loadRasterizedSvg();
         this.fetchRequests();
+        this.addFixedMarker(); // Add the fixed marker here
         setInterval(() => {
             this.fetchRequests(); // Fetch updates every 3 seconds
-        }, 3000)
+        }, 3000);
     },
     methods: {
         initMap() {
@@ -125,12 +128,28 @@ export default {
                 });
         },
 
-        addMarkerFromGps(lat, lon, name, problemType) {
+        addFixedMarker() {
+            console.log('Adding fixed marker');
+            const lat = 11.1063642;
+            const lon = 106.6131716;
+            const svgCoordinates = this.transformToSvg(lat, lon);
+            console.log(`Fixed Marker SVG Coordinates: ${svgCoordinates}`);
+
+            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 634 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 634) {
+                const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], 'Fixed Point', 'Health problem', 'Fixed description');
+                this.fixedMarker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
+                console.log('Fixed marker added successfully');
+            } else {
+                console.error('Fixed marker coordinates out of bounds:', svgCoordinates);
+            }
+        },
+
+        addMarkerFromGps(lat, lon, name, problemType, description) {
             console.log(`Adding marker for: ${name}, Lat: ${lat}, Lon: ${lon}`);
             const svgCoordinates = this.transformToSvg(lat, lon);
             console.log(`SVG Coordinates: ${svgCoordinates}`);
             if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 634 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 634) {
-                const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], name, problemType);
+                const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], name, problemType, description);
                 const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
                 this.markers.push(marker);
             } else {
@@ -138,12 +157,13 @@ export default {
             }
         },
 
-        createPopupContent(markerCoordinates, gpsCoordinates, name, problemType) {
+        createPopupContent(markerCoordinates, gpsCoordinates, name, problemType, description) {
             const gpsLat = gpsCoordinates[0].toFixed(6);
             const gpsLng = gpsCoordinates[1].toFixed(6);
             return `
                 <b>Name:</b> ${name} <br>
                 <b>Problem Type:</b> ${problemType} <br>
+                <b>Description:</b> ${description} <br>
                 <b>SVG Coordinates:</b> ${markerCoordinates.lat.toFixed(2)}, ${markerCoordinates.lng.toFixed(2)}<br>
                 <b>GPS Coordinates:</b> ${gpsLat}, ${gpsLng}
             `;
@@ -173,102 +193,41 @@ export default {
             this.markers = [];
         },
         async fetchRequests() {
-            this.clearMarkers()
+            this.clearMarkers();
             try {
                 const querySnapshot = await getDocs(collection(this.db, 'user-location'));
                 this.requests = querySnapshot.docs;
-                this.requests = this.requests.filter(request => request.data().display == true);
+                this.requests = this.requests.filter(request => request.data().display === true);
 
                 this.requests.forEach((request) => {
-                    this.addMarkerFromGps(request.data().lat, request.data().lon, request.data().name, request.data().problemType);
+                    this.addMarkerFromGps(request.data().lat, request.data().lon, request.data().name, request.data().problemType, request.data().description);
                 });
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('Error fetching requests:', error);
             }
-        },
-    },
+        }
+    }
 };
 </script>
 
-<style scoped>
+<style>
 .container-fluid {
-    margin-top: 200px;
-    width: 100%;
-    text-align: center;
-    overflow: visible;
-    margin-bottom: 20%;
+    padding: 20px;
 }
-
-@media only screen and (min-width: 600px) {
-    .container-fluid {
-        margin-top: 70px;
-        margin-bottom: 5%;
-    }
-
-    .container-fluid h2 {
-        padding-top: 50px;
-    }
+.map-container {
+    height: 500px;
 }
-
-#app {
-    margin-top: 20px;
-}
-
-#map {
-    height: 700px;
-    width: 100%;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    z-index: -1;
-    position: relative;
-    overflow: auto;
-}
-
-.button-container {
-    display: flex;
-    gap: 10px;
-}
-
-.map-button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.map-button:hover {
-    background-color: #0056b3;
-}
-
-.coordinates-display {
-    margin-top: 20px;
-    font-size: 16px;
-    color: #333;
-}
-
-ul {
-    list-style-type: none;
+.table-user {
+    list-style: none;
     padding: 0;
-    margin-top: 20px;
-    text-align: left;
 }
-
-li {
-    background-color: #f9f9f9;
+.table-user li {
     margin-bottom: 10px;
+    border: 1px solid #ccc;
     padding: 10px;
     border-radius: 5px;
 }
-
-li p {
-    margin-left: 20px;
-}
-
 .title {
-    font-size: 20px;
+    font-weight: bold;
 }
 </style>
