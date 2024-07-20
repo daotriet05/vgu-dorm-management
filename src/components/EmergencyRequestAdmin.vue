@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-lg-10 offset-lg-1">
+            <div class="col-lg-8 offset-lg-2">
                 <h2>Emergency Requests Admin</h2>
                 <div id="app">
                     <div id="map" class="map-container"></div>
@@ -59,7 +59,7 @@ export default {
         this.fetchRequests();
         this.addFixedMarker();
         setInterval(() => {
-            this.fetchRequests(); // Fetch updates every 3 seconds
+            this.fetchRequests();
         }, 3000);
     },
     methods: {
@@ -215,7 +215,7 @@ export default {
     padding: 20px;
 }
 .map-container {
-    height: 700px; /* Increase the height of the map container */
+    height: 700px;
 }
 .table-user {
     list-style: none;
