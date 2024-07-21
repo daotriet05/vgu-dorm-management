@@ -127,9 +127,15 @@ export default {
 
         addMarkerFromGps(lat, lon, user, problemType, description) {
             const svgCoordinates = this.transformToSvg(lat, lon);
-            const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], user, problemType, description);
-            const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent);
-            this.markers.push(marker);
+            console.log(`SVG Coordinates: ${svgCoordinates}`);
+            if (svgCoordinates[0] >= 0 && svgCoordinates[0] <= 700 && svgCoordinates[1] >= 0 && svgCoordinates[1] <= 700) {
+                const popupContent = this.createPopupContent({ lat: svgCoordinates[0], lng: svgCoordinates[1] }, [lat, lon], user.name, problemType, description);
+                const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
+                this.markers.push(marker);
+            } else {
+                alert('You are out of VGU dorm area. Please enter to start request');
+                console.error('Coordinates out of bounds:', svgCoordinates);
+            }
         },
 
         createPopupContent(markerCoordinates, gpsCoordinates, user, problemType, description) {

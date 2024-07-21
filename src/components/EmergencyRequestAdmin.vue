@@ -135,7 +135,7 @@ export default {
                 const marker = L.marker(svgCoordinates).addTo(this.map).bindPopup(popupContent).openPopup();
                 this.markers.push(marker);
             } else {
-                alert('You are out of VGU dorm area. Please enter to start request');
+                //alert('You are out of VGU dorm area. Please enter to start request');
                 console.error('Coordinates out of bounds:', svgCoordinates);
             }
         },
